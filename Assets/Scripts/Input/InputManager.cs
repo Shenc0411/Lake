@@ -1,10 +1,11 @@
 ﻿namespace Lake.Input
 {
+    using Lake.Interfaces;
     using Lake.Utilities;
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using UnityEngine;
-    using System;
 
     public class InputManager : Singleton<InputManager>
     {
@@ -84,6 +85,7 @@
         public bool ButtonXHold { get => m_buttonXHold; }
         public bool ButtonYHold { get => m_buttonYHold; }
         public bool ButtonAHold { get => m_buttonAHold; }
+        public bool ButtonBHold { get => m_buttonBHold; }
         public bool LeftBumperHold { get => m_leftBumperHold; }
         public bool RightBumperHold { get => m_rightBumperHold; }
         public bool DPadUpHold { get => m_DPadUpHold; }
@@ -116,8 +118,45 @@
         public Action OnLeftTriggerReleased { get => onLeftTriggerReleased; set => onLeftTriggerReleased = value; }
         public Action OnRightTriggerPressed { get => onRightTriggerPressed; set => onRightTriggerPressed = value; }
         public Action OnRightTriggerReleased { get => onRightTriggerReleased; set => onRightTriggerReleased = value; }
+        
 
         //public GazePoint CurrentGazePoint { get => _currentGazePoint; }
+
+        public void RegisterControllable(IControllable controllable)
+        {
+            if(controllable == null)
+            {
+                throw new NullReferenceException();
+            }
+
+            OnButtonXPressed += controllable.Callback_OnButtonXPressed;
+            OnButtonXReleased += controllable.Callback_OnButtonXReleased;
+            OnButtonYPressed += controllable.Callback_OnButtonYPressed;
+            OnButtonYReleased += controllable.Callback_OnButtonYReleased;
+            OnButtonAPressed += controllable.Callback_OnButtonAPressed;
+            OnButtonAReleased += controllable.Callback_OnButtonAReleased;
+            OnButtonBPressed += controllable.Callback_OnButtonBPressed;
+            OnButtonBReleased += controllable.Callback_OnButtonBReleased;
+            OnLeftBumperPressed += controllable.Callback_OnLeftBumperPressed;
+            OnLeftBumperReleased += controllable.Callback_OnLeftBumperReleased;
+            OnRightBumperPressed += controllable.Callback_OnRightBumperPressed;
+            OnRightBumperReleased += controllable.Callback_OnRightBumperReleased;
+            OnDPadUpPressed += controllable.Callback_OnDPadUpPressed;
+            OnDPadUpReleased += controllable.Callback_OnDPadUpReleased;
+            OnDPadDownPressed += controllable.Callback_OnDPadDownPressed;
+            OnDPadDownReleased += controllable.Callback_OnDPadDownReleased;
+            OnDPadLeftPressed += controllable.Callback_OnDPadLeftPressed;
+            OnDPadLeftReleased += controllable.Callback_OnDPadLeftReleased;
+            OnDPadRightPressed += controllable.Callback_OnDPadRightPressed;
+            OnDPadRightReleased += controllable.Callback_OnDPadRightReleased;
+            OnLeftTriggerPressed += controllable.Callback_OnLeftTriggerPressed;
+            OnLeftTriggerReleased += controllable.Callback_OnLeftTriggerReleased;
+            OnRightTriggerPressed += controllable.Callback_OnRightTriggerPressed;
+            OnRightTriggerReleased += controllable.Callback_OnRightTriggerReleased;
+
+            Debug.Log("Registered " + controllable);
+
+        }
 
 
         protected override void Awake()
@@ -244,24 +283,24 @@
 
             if (m_leftTriggerHold && m_leftTrigger == 0.0f)
             {
-                OnLeftTriggerReleased?.Invoke();
                 m_leftTriggerHold = false;
+                OnLeftTriggerReleased?.Invoke();
             }
             else if (!m_leftTriggerHold && m_leftTrigger > 0.0f)
             {
-                OnLeftTriggerPressed?.Invoke();
                 m_leftTriggerHold = true;
+                OnLeftTriggerPressed?.Invoke();
             }
 
             if (m_rightTriggerHold && m_rightTrigger == 0.0f)
             {
-                OnRightTriggerReleased?.Invoke();
                 m_rightTriggerHold = false;
+                OnRightTriggerReleased?.Invoke();
             }
             else if (!m_rightTriggerHold && m_rightTrigger > 0.0f)
             {
-                OnRightTriggerPressed?.Invoke();
                 m_rightTriggerHold = true;
+                OnRightTriggerPressed?.Invoke();
             }
 
             #endregion
