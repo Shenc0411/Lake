@@ -14,8 +14,11 @@
 
         #region Axis Values
         private Vector2 m_leftStick;
+        private Vector2 m_normalizedLeftStick;
         private Vector2 m_rightStick;
+        private Vector2 m_normalizedRightStick;
         private Vector2 m_DPad;
+        private Vector2 m_normalizedDPad;
         private float m_leftTrigger = 0.0f;
         private float m_rightTrigger = 0.0f;
         #endregion
@@ -77,11 +80,15 @@
         //#endregion
 
         //public bool EyetrackingEnabled { get => _eyetrackingEnabled; }
+
         public Vector2 LeftStick { get => m_leftStick; }
         public Vector2 RightStick { get => m_rightStick; }
+        public Vector2 DPad { get => m_DPad; }
+        public Vector2 NormalizedLeftStick { get => m_normalizedLeftStick; }
+        public Vector2 NormalizedRightStick { get => m_normalizedRightStick; }
+        public Vector2 NormalizedDPad { get => m_normalizedDPad; }
         public float LeftTrigger { get => m_leftTrigger; }
         public float RightTrigger { get => m_rightTrigger; }
-        public Vector2 DPad { get => m_DPad; }
         public bool ButtonXHold { get => m_buttonXHold; }
         public bool ButtonYHold { get => m_buttonYHold; }
         public bool ButtonAHold { get => m_buttonAHold; }
@@ -94,6 +101,7 @@
         public bool DPadRightHold { get => m_DPadRightHold; }
         public bool LeftTriggerHold { get => m_leftTriggerHold; }
         public bool RightTriggerHold { get => m_rightTriggerHold; }
+
         public Action OnButtonXPressed { get => onButtonXPressed; set => onButtonXPressed = value; }
         public Action OnButtonXReleased { get => onButtonXReleased; set => onButtonXReleased = value; }
         public Action OnButtonYPressed { get => onButtonYPressed; set => onButtonYPressed = value; }
@@ -118,7 +126,6 @@
         public Action OnLeftTriggerReleased { get => onLeftTriggerReleased; set => onLeftTriggerReleased = value; }
         public Action OnRightTriggerPressed { get => onRightTriggerPressed; set => onRightTriggerPressed = value; }
         public Action OnRightTriggerReleased { get => onRightTriggerReleased; set => onRightTriggerReleased = value; }
-        
 
         //public GazePoint CurrentGazePoint { get => _currentGazePoint; }
 
@@ -210,6 +217,9 @@
             m_rightTrigger = Input.GetAxis("RightTrigger");
             m_DPad.x = Input.GetAxis("DPadX");
             m_DPad.y = Input.GetAxis("DPadY");
+            m_normalizedLeftStick = m_leftStick.normalized;
+            m_normalizedRightStick = m_rightStick.normalized;
+            m_normalizedDPad = m_DPad.normalized;
             #endregion
 
             //#region EyeTracking

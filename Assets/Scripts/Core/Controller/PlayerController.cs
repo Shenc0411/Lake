@@ -10,132 +10,145 @@
 
     public class PlayerController : MonoBehaviour, IControllable
     {
+        private InputManager inputManager = default;
+        private Camera FPSCamera = default;
+
         [SerializeField]
-        private Character m_character = default;
+        private Character character = default;
 
-        private InputManager m_inputManager = default;
 
-        public Character Character { get => m_character; set => m_character = value; }
+        private float minPitchAngle = -60.0f;
+        private float maxPitchAngle = 60.0f;
+        private float currentPitchAngle = 0.0f;
+        private float pitchSpeed = 45.0f; 
+
+        private float currentFacingAngleRad = 90.0f * Mathf.Deg2Rad;
+        private Vector3 actualProjectedForward = default;
+        private Quaternion actualProjectedRotation = default;
+        
+        private Vector3 movement = default;
+
+        public Character Character { get => this.character; set => this.character = value; }
 
         #region Input Callbacks
         public void Callback_OnButtonAPressed()
         {
-            throw new System.NotImplementedException();
+            this.character.Interact();
         }
 
         public void Callback_OnButtonAReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnButtonBPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnButtonBReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnButtonXPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnButtonXReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnButtonYPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnButtonYReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnDPadDownPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnDPadDownReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnDPadLeftPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnDPadLeftReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnDPadRightPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnDPadRightReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnDPadUpPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnDPadUpReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnLeftBumperPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnLeftBumperReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnLeftTriggerPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnLeftTriggerReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnRightBumperPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnRightBumperReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnRightTriggerPressed()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public void Callback_OnRightTriggerReleased()
         {
-            throw new System.NotImplementedException();
+            
         }
         #endregion
 
@@ -146,16 +159,66 @@
 
         private void Start()
         {
-            if(InputManager.Instance != null)
+            if (InputManager.Instance != null)
             {
                 InputManager.Instance.RegisterControllable(this);
-                m_inputManager = InputManager.Instance;
+                this.inputManager = InputManager.Instance;
             }
             else
             {
                 Debug.LogError("InputManager not found. Destroying gameobject " + name);
+                Destroy(this.gameObject);
+            }
+
+            this.FPSCamera = Camera.main;
+            if (this.FPSCamera == null)
+            {
+                Debug.LogError("InputManager not found. Destroying gameobject " + name);
+                Destroy(this.gameObject);
             }
         }
+
+        private void Update()
+        {
+            this.MovementHandler();
+        }
+
+        private void MovementHandler()
+        {
+            Vector2 rawRotationInput = this.inputManager.RightStick;
+
+            this.currentFacingAngleRad += -rawRotationInput.x * this.character.RotationSpeed * Time.deltaTime;
+
+            if (this.currentFacingAngleRad > 2.0f * Mathf.PI)
+            {
+                this.currentFacingAngleRad -= 2.0f * Mathf.PI;
+            }
+            else if (this.currentFacingAngleRad < -2.0f * Mathf.PI)
+            {
+                this.currentFacingAngleRad += 2.0f * Mathf.PI;
+            }
+            
+            this.actualProjectedForward.x = Mathf.Cos(currentFacingAngleRad);
+            this.actualProjectedForward.z = Mathf.Sin(currentFacingAngleRad);
+            this.actualProjectedRotation = Quaternion.LookRotation(this.actualProjectedForward, Vector3.up);
+
+            this.currentPitchAngle += rawRotationInput.y * this.pitchSpeed * Time.deltaTime;
+            this.currentPitchAngle = Mathf.Clamp(this.currentPitchAngle, this.minPitchAngle, this.maxPitchAngle);
+
+            this.transform.rotation = this.actualProjectedRotation;
+            this.FPSCamera.transform.rotation = this.actualProjectedRotation;
+            this.FPSCamera.transform.Rotate(new Vector3(this.currentPitchAngle, 0, 0));
+
+            Vector2 rawMovement = this.inputManager.NormalizedLeftStick;
+            this.movement.x = rawMovement.x;
+            this.movement.z = -rawMovement.y;
+
+            this.movement = this.actualProjectedRotation * this.movement * this.character.MoveSpeed * Time.deltaTime;
+
+            this.transform.position += movement;
+        }
+
+
 
     }
 
