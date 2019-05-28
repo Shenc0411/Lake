@@ -29,6 +29,8 @@
         private Vector3 movement = default;
 
         public Character Character { get => this.character; set => this.character = value; }
+        public Vector3 ActualProjectedForward { get => this.actualProjectedForward; }
+        public Quaternion ActualProjectedRotation { get => this.actualProjectedRotation; }
 
         #region Input Callbacks
         public void Callback_OnButtonAPressed()
@@ -198,8 +200,8 @@
                 this.currentFacingAngleRad += 2.0f * Mathf.PI;
             }
             
-            this.actualProjectedForward.x = Mathf.Cos(currentFacingAngleRad);
-            this.actualProjectedForward.z = Mathf.Sin(currentFacingAngleRad);
+            this.actualProjectedForward.x = Mathf.Cos(this.currentFacingAngleRad);
+            this.actualProjectedForward.z = Mathf.Sin(this.currentFacingAngleRad);
             this.actualProjectedRotation = Quaternion.LookRotation(this.actualProjectedForward, Vector3.up);
 
             this.currentPitchAngle += rawRotationInput.y * this.pitchSpeed * Time.deltaTime;
@@ -215,7 +217,7 @@
 
             this.movement = this.actualProjectedRotation * this.movement * this.character.MoveSpeed * Time.deltaTime;
 
-            this.transform.position += movement;
+            this.transform.position += this.movement;
         }
 
 
